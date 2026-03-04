@@ -2461,17 +2461,17 @@
     }
     ```
     ```jsx
-         worker.js:
-        // 1. Получаем сообщение ИЗ основного потока
-        self.onmessage = function(event) {
-          console.log('Воркер получил данные:', event.data);
-        
-          // Выполняем тяжелую работу...
-          const result = event.data.data.map(x => x * 2); // Пример обработки
-        
-          // 2. Отправляем результат обратно в основной поток
-          self.postMessage('Результат обработки: ' + result);
-        };
+     worker.js:
+    // 1. Получаем сообщение ИЗ основного потока
+    self.onmessage = function(event) {
+      console.log('Воркер получил данные:', event.data);
+    
+      // Выполняем тяжелую работу...
+      const result = event.data.data.map(x => x * 2); // Пример обработки
+    
+      // 2. Отправляем результат обратно в основной поток
+      self.postMessage('Результат обработки: ' + result);
+    };
     ```
 
 1. События жизненного цикла страницы
