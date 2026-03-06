@@ -1333,7 +1333,56 @@
     ```
     
 
-50. Напишите простую функцию, чтобы проверить, является ли число целым
+50. Что такое IndexedDB и для чего он используется? Чем отличается от localStorage?
+    ```jsx
+    IndexedDB — это встроенная в браузер низкоуровневая NoSQL система управления базами данных для хранения значительных объемов структурированных данных на стороне клиента.
+    Для чего используется:
+    Хранение больших объемов данных (от нескольких мегабайт до гигабайтов).
+    Хранение данных, требующих сложной выборки и ндексации.
+    Офлайн-приложения (PWA), которым нужен доступ к данным без интернета.
+    Хранение файлов, изображений или видео (в формате Blob)./
+    В отличие от localStorage, это полноценная БД, хранит не только строки, асиннхронная, поддерживает индексацию, поиск, транзакции
+    
+    let db;
+    const request = indexedDB.open("MyDatabase", 1);
+
+    request.onerror = (event) => {
+      console.error("Ошибка БД:", event.target.error);
+    };
+    
+    request.onsuccess = (event) => {
+      db = event.target.result;
+      console.log("База данных открыта");
+    };
+    
+    // Срабатывает при создании БД или изменении версии (только здесь можно менять структуру)
+    request.onupgradeneeded = (event) => {
+      const db = event.target.result;
+    
+      // Создаем объектное хранилище (аналог таблицы) с названием "users"
+      // { keyPath: "id" } означает, что ключом будет поле "id" самого объекта
+      const objectStore = db.createObjectStore("users", { keyPath: "id", autoIncrement: false });
+    
+      console.log("Объектное хранилище создано");
+    };
+
+    function addUser(user) {
+      // Транзакция: "readwrite" (чтение и запись), хранилище: "users"
+      const transaction = db.transaction(["users"], "readwrite");
+      const store = transaction.objectStore("users");
+    
+      const request = store.add(user);
+    }
+    
+    function getUser(id) {
+      const transaction = db.transaction(["users"], "readonly");
+      const store = transaction.objectStore("users");
+      const request = store.get(id); // Получаем по ключу (id)
+    
+    }
+    ```
+
+51.  Напишите простую функцию, чтобы проверить, является ли число целым
 
     ```jsx
     function isInteger(num) {
@@ -1341,14 +1390,14 @@
     }
     ```
 
-51. **Написать код для получения текущего URL**
+52. **Написать код для получения текущего URL**
 
     ```jsx
     
     const currentUrl = window.location.href;
     ```
 
-52. **Что такое Symbol и зачем нужен?**
+53. **Что такое Symbol и зачем нужен?**
 
     «Символ» представляет собой уникальный идентификатор. Символы гаранитровано уникальны, не конвертируются в строку.
     Символы позволяют создавать «скрытые» свойства объектов, к которым нельзя нечаянно обратиться и перезаписать их из других частей программы.
@@ -1367,7 +1416,7 @@
     let id = Symbol.for("id"); // если символа не существует, он будет создан
     ```
 
-53. **разница между xmlhttprequest, fetch, axios**
+54. **разница между xmlhttprequest, fetch, axios**
 
     ```jsx
     xmlhttprequest старый, fetch современный, axios либа, еще лучше, т.к. встроенная поддержка интерсепторов, ловит исключения сам, встроенный abortController и т.д.
