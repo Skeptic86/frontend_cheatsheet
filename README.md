@@ -2522,11 +2522,48 @@
       self.postMessage('Результат обработки: ' + result);
     };
     ```
+    
 15. Что такое SharedWorker и чем он отличается от обычного Web Worker?
     ```jsx
     SharedWorker — это специальный тип Web Worker, который может быть разделяем между несколькими
     контекстами браузера (разные вкладки, iframe'ы или окна) из одного источника (same origin).
+    ```
     
+16. Что такое ServiceWorker и чем он отличается от других воркеров?
+    ```jsx
+    Service Worker — это скрипт, который браузер запускает в фоновом режиме, отдельно от веб-страницы.
+    Он действует как программируемый прокси-сервер, расположенный между вашим приложением, браузером и сетью.
+    Может работать без открытой страницы и управлять сетью (перехватывать запросы, кэшировать и обеспечивать оффлайн-доступ)
+    //main.js
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', () => {
+        navigator.serviceWorker.register('/sw.js')
+          .then(registration => {
+            console.log('ServiceWorker зарегистрирован:', registration.scope);
+          })
+          .catch(error => {
+            console.log('Ошибка регистрации ServiceWorker:', error);
+          });
+      });
+    }
+    
+    // sw.js
+    console.log('Service Worker файл загружен');
+    
+    self.addEventListener('install', event => {
+      console.log('Установка Service Worker');
+      // Здесь будем кэшировать файлы
+    });
+    
+    self.addEventListener('activate', event => {
+      console.log('Активация Service Worker');
+      // Здесь будем чистить старый кэш
+    });
+    
+    self.addEventListener('fetch', event => {
+      console.log('Перехват запроса:', event.request.url);
+      // Здесь будем решать, отдавать кэш или лезть в сеть
+    });
     ```
 
 
