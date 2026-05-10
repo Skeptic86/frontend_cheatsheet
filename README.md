@@ -1681,6 +1681,28 @@
     поскольку значения централизованно управляются в одном месте.
     
     5)Перевод enum в массив
+
+    Enum - это специальный тип данный, перечисление. По сути это упорядоченная коллекция -
+    ключ значения, которая компилируется в объект с двусторонним отображением ключ ↔ значение
+    // TypeScript код
+    enum Status {
+      Pending,
+      Success,
+      Error = 5,
+      NotFound
+    }
+    Компилируется в JavaScript (IIFE):
+    
+    javascript
+    var Status;
+    (function (Status) {
+        Status[Status["Pending"] = 0] = "Pending";
+        Status[Status["Success"] = 1] = "Success";
+        Status[Status["Error"] = 5] = "Error";
+        Status[Status["NotFound"] = 6] = "NotFound";
+    })(Status || (Status = {}));
+    
+    Const enum — enum, который полностью удаляется при компиляции, а значения подставляются инлайн
     ```
     
 7. Что такое Generic типы
@@ -1771,18 +1793,109 @@
 12. keyof typeof
     
     ```jsx
-    https://stackoverflow.com/questions/55377365/what-does-keyof-typeof-mean-in-typescript
+        https://stackoverflow.com/questions/55377365/what-does-keyof-typeof-mean-in-typescript
     ```
 
 13. Generic Constraint
 
     ```jsx
-    // С ограничением (T должен иметь свойство length)
-    function identityWithConstraint<T extends { length: number }>(arg: T): T {
-      console.log(arg.length); // ✅ Теперь можем обращаться к length
-      return arg;
-    }
+        // С ограничением (T должен иметь свойство length)
+        function identityWithConstraint<T extends { length: number }>(arg: T): T {
+          console.log(arg.length); // ✅ Теперь можем обращаться к length
+          return arg;
+        }
     ```
+
+14. Что такое литеральные типы? Что такое literal widening? Как его не допустить?
+
+    ```jsx
+        1. Литеральные типы — это типы, которые представляют конкретное значение, а не множество значений.
+        Они могут быть строковыми, числовыми или булевыми литералами.
+        let status: 'success' | 'error' = 'success';  // может быть только 'success' или 'error'
+        let diceRoll: 1 | 2 | 3 | 4 | 5 | 6 = 4;
+        
+        2. Literal widening — это автоматическое расширение TypeScript'ом литерального типа
+         до более широкого (например, 'hello' расширяется до string).
+        
+        Когда происходит widening:
+        typescript
+        // ❌ Проблема: widening автоматически расширяет тип
+        let str = 'hello';     // тип: string (не 'hello')
+        let num = 42;          // тип: number (не 42)
+        let bool = true;       // тип: boolean (не true)
+        
+        // А вот const не расширяется
+        const constStr = 'hello';  // тип: 'hello' (остается литералом)
+        const constNum = 42;       // тип: 42
+        
+        3. Template literal types — это типы, которые позволяют создавать новые строковые типы
+         на основе шаблонов, аналогично шаблонным строкам в JavaScript, но на уровне типов.
+        
+        type Greeting = `Hello, ${string}!`;
+        let message: Greeting = 'Hello, World!';  // ✅
+        message = 'Hi there';                     // ❌ Error
+        
+        type EventName = `on${Capitalize<string>}`;
+        let event: EventName = 'onClick';  // ✅
+        event = 'onMouseMove';              // ✅
+    ```
+
+15. Что такое exhaustive check? Как он связан с never?
+    ```jsx
+        Exhaustive check — это проверка, что обработаны все возможные варианты в union-типе.
+        Компилятор TypeScript может гарантировать, что вы ничего не забыли.
+        
+        Связь с never:
+        never используется как маркер исчерпанности:
+        Когда все варианты обработаны, остается тип never
+        Если вы забыли какой-то вариант, TypeScript выдаст ошибку
+    ```
+
+16. 1. Что делает as const при применении к объекту или массиву?
+    2. Чем тип объекта без as const отличается от типа того же объекта с as const? Как это связано с literal widening?
+    3. Как as const влияет на строковые и числовые значения в объекте?
+    4. Как меняется тип массива при использовании as const?
+    5. Является ли as const глубокой неизменяемостью на уровне выполнения кода?
+
+    ```jsx
+        1. as const (const assertion) говорит TypeScript, что значение следует рассматривать как максимально конкретный,
+        неизменяемый литеральный тип. Он делает три вещи:
+        Все свойства/элементы становятся readonly
+        
+        Числовые и строковые значения выводятся как литералы, а не как number/string
+        
+        Вложенные структуры обрабатываются рекурсивно
+        
+        2. as const отключает автоматическое расширение литералов, сохраняя их конкретные значения как типы.
+        В обычном объекте ({ mode: "production" }) литерал "production" расширяется до string. as const предотвращает это расширение.
+        3. as const превращает строковые и числовые значения в конкретные литералы и предотвращает literal widening
+        4. as const превращает массив в кортеж, конкретной длинны, readonly, каждый элемент конкретный литерал
+        5. as const работает только на уровне типов TypeScript, не на уровне выполнения JavaScript.
+    ```
+
+17. 1. Что делает модификатор readonly у полей в интерфейсах/типах?
+       Пример: `type A = { readonly a: string }`
+    2. Как readonly работает на вложенные объекты? Станет ли весь объект readonly,
+       если к полю где он лежит применить модификатор readonly?
+
+    ```jsx
+        1. readonly делает поле доступным только для чтения на уровне TypeScript — после инициализации его нельзя перезаписать.
+        type User = { 
+          readonly id: string;  // только для чтения
+          name: string;         // можно изменять
+        };
+        
+        2. Важно: readonly не делает автоматически вложенные объекты readonly. Он применяется только к самому полю, а не к его содержимому.
+        НЕТ! readonly работает ТОЛЬКО на уровне TypeScript (компиляции).
+        readonly — это чисто типовая конструкция, которая:
+        Не влияет на скомпилированный JavaScript
+        Не создает никакой runtime-защиты
+        Исчезает после компиляции
+    ```
+    
+
+
+
 
 ## React
 
