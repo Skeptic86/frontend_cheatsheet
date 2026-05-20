@@ -1840,7 +1840,23 @@
         event = 'onMouseMove';              // ✅
     ```
 
-15. Что такое exhaustive check? Как он связан с never?
+15. Что такое discriminated union?
+     ```ts
+        Это объединение типов (union), у которых есть общее поле-дискриминант (например, type, kind). По значению этого поля TypeScript может точно определить, с каким именно типом из объединения мы работаем.
+
+        type Circle = { kind: "circle"; radius: number };
+        type Square = { kind: "square"; side: number };
+        type Shape = Circle | Square;
+        
+        function area(s: Shape) {
+          if (s.kind === "circle") return Math.PI * s.radius ** 2; // TS знает, что это Circle
+          return s.side ** 2; // TS знает, что это Square
+        }
+
+    ```
+
+
+16. Что такое exhaustive check? Как он связан с never?
     ```jsx
         Exhaustive check — это проверка, что обработаны все возможные варианты в union-типе.
         Компилятор TypeScript может гарантировать, что вы ничего не забыли.
@@ -1851,7 +1867,7 @@
         Если вы забыли какой-то вариант, TypeScript выдаст ошибку
     ```
 
-16. 1. Что делает as const при применении к объекту или массиву?
+17. 1. Что делает as const при применении к объекту или массиву?
     2. Чем тип объекта без as const отличается от типа того же объекта с as const? Как это связано с literal widening?
     3. Как as const влияет на строковые и числовые значения в объекте?
     4. Как меняется тип массива при использовании as const?
@@ -1873,7 +1889,7 @@
         5. as const работает только на уровне типов TypeScript, не на уровне выполнения JavaScript.
     ```
 
-17. 1. Что делает модификатор readonly у полей в интерфейсах/типах?
+18. 1. Что делает модификатор readonly у полей в интерфейсах/типах?
        Пример: `type A = { readonly a: string }`
     2. Как readonly работает на вложенные объекты? Станет ли весь объект readonly,
        если к полю где он лежит применить модификатор readonly?
